@@ -3,6 +3,7 @@
 背景： 上传文件到云服务器
        入口（controller） -> 云服务 （service） -> 云基础组件 （SDK）
 
+// 入口
 @AllArgsConstructor
 @Data
 public class CloudController {
@@ -15,3 +16,53 @@ public class CloudController {
         cloudController.storeFileToCloud();
     }
 }
+
+// 云服务
+public class CloudService {
+    CloudSDK cloudSDK;
+    CloudService(String strategy) {
+        this.cloudSDK = CloudFactory.create(strategy);
+    }
+    public void uploadFile(String fileName){
+        cloudSDK.putObject(fileName);
+    }
+}
+
+public interface CloudSDK {
+     void putObject(String fileName);
+}
+
+// 云组件工厂
+public class CloudFactory {
+    static Map<String,CloudSDK> cloudSDKMap = new HashMap<>();
+    static {
+        cloudSDKMap.put("ALISDK",new AliSDKAdapter(new AliSDK()));
+        cloudSDKMap.put("AWSSDK",new AWSSDKAdapter(new AWSSDK()));
+    }
+
+    public static CloudSDK create(String strategy) {
+        return cloudSDKMap.get(strategy);
+    }
+}
+
+@Data
+@AllArgsConstructor
+public class AWSSDKAdapter implements CloudSDK{
+    private AWSSDK awssdk;
+    @Override
+    public void putObject(String fileName) {
+        awssdk.putObject(fileName);
+    }
+}
+
+@Data
+@AllArgsConstructor
+public class AliSDKAdapter implements CloudSDK{
+    private AliSDK aliSDK;
+    @Override
+    public void putObject(String fileName) {
+        aliSDK.setBucket();
+        aliSDK.putObject(fileName);
+    }
+}
+
