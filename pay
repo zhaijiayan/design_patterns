@@ -2,6 +2,8 @@ Strategy+Factory+Adaptation
 
 // 背景： 支付商品有多种方式 (信用卡，银行卡等)
 
+// 思路： 支付  ->支付本身需要实现什么功能（比如支付多少钱）， 支付主体是什么（比如商品（实物+虚拟物品））， 支付方式是什么（实物卡+虚拟支付），
+
 // 支付接口
 public interface PaymentMethod {
     void pay(int cents);
@@ -16,8 +18,82 @@ public abstract class Card implements PaymentMethod{
 
     protected abstract void executeTransition(int cents);
 }
+// 卡片类
+public class CreditCard extends Card{
+    @Override
+    protected String getType() {
+        return "Credit";
+    }
+
+    @Override
+    protected void executeTransition(int cents) {
+        System.out.println("doTransition with credit:"+cents);
+    }
+}
+
+public class DebitCard extends Card{
+    @Override
+    protected String getType() {
+        return "Debit";
+    }
+
+    @Override
+    protected void executeTransition(int cents) {
+        System.out.println("doTransition with debit:"+cents);
+    }
+}
+
 
 //支付商品之前得有一个账单
+public class Bill {
+
+    private List<Item> items = new ArrayList();
+
+    public void addItem(Item item){
+        items.add(item);
+    }
+
+    public void removeItem(Item item){
+        items.remove(item);
+    }
+
+    public int getSumCents(){
+        return items.stream().mapToInt(Item::getCents).sum();
+    }
+
+    public void pay(PaymentMethod paymentMethod){
+        paymentMethod.pay(getSumCents());
+    }
+}
+
+public class PaymentMethodFactory {
+
+    public static  PaymentMethod getPaymentMethod(String type){
+        switch (type){
+            case "credit":
+                return new CreditCard();
+            case "debit":
+                return new DebitCard();
+            default:
+                return null;
+        }
+    }
+}
+
+// test
+public class StrategyDemo {
+    public static void main(String[] args) {
+        Bill bill = new Bill();
+        bill.addItem(new Item("JVM",200000));
+        bill.addItem(new Item("zhai",40000));
+        // 使用工厂模式创建
+        bill.pay(PaymentMethodFactory.getPaymentMethod("credit"));
+        bill.removeItem(new Item("zhai",40000));
+        // 自己new 一个卡片，如果暴露给三方用的话，基于越简单越好，一般是只会传参，不会让人家new 一个对象，这种不太现实
+        Card card1 = new DebitCard();
+        bill.pay(card1);
+    }
+}
 
 
 
