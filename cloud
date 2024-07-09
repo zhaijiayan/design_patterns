@@ -1,1 +1,17 @@
-// 策略+工厂+适配
+// 策略 + 工厂 + 适配
+// 设计思想
+背景： 上传文件到云服务器
+       入口（controller） -> 云服务 （service） -> 云基础组件 （SDK）
+
+@AllArgsConstructor
+@Data
+public class CloudController {
+    CloudService cloudService;
+    public void storeFileToCloud(){
+        cloudService.uploadFile("jia mao cloud");
+    }
+    public static void main(String[] args) {
+        CloudController cloudController = new CloudController(new CloudService("AWSSDK"));
+        cloudController.storeFileToCloud();
+    }
+}
