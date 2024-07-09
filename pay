@@ -1,0 +1,23 @@
+Strategy+Factory+Adaptation
+
+// 背景： 支付商品有多种方式 (信用卡，银行卡等)
+
+// 支付接口
+public interface PaymentMethod {
+    void pay(int cents);
+}
+
+//创建抽象类卡
+public abstract class Card implements PaymentMethod{
+    public void pay(int cents){
+        executeTransition(cents);
+    }
+    protected abstract String getType();
+
+    protected abstract void executeTransition(int cents);
+}
+
+//支付商品之前得有一个账单
+
+
+
