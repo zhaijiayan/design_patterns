@@ -66,3 +66,20 @@ public class AliSDKAdapter implements CloudSDK{
     }
 }
 
+public class AWSSDK {
+
+    public void putObject(String fileName){
+        System.out.println("use aws"+fileName);
+    }
+}
+
+public class AliSDK {
+
+    public void setBucket(){
+        System.out.println("ali oss fist set bucket");
+    }
+
+    public void putObject(String fileName){
+        System.out.println("use ali"+fileName);
+    }
+}
